@@ -16,7 +16,15 @@ public class EditConditionDrawer : PropertyDrawer
 
 		//-- Get edit condition property
 		object parent = GetParent(property);
-		object condValue = GetValue(parent, editCondition.ConditionName);
+		string conditionName = editCondition.ConditionName;
+		int numNegations = 0;
+		while (conditionName[0] == '!')
+		{
+			numNegations++;
+			conditionName = conditionName.Substring(1);
+		}
+
+		object condValue = GetValue(parent, conditionName);
 		if (condValue == null)
 		{
 			GUIStyle labelStyle = new GUIStyle(EditorStyles.label);
@@ -25,18 +33,26 @@ public class EditConditionDrawer : PropertyDrawer
 			return;
 		}
 		bool condition = (bool)condValue;
+		if ((numNegations & 1) == 1)
+		{
+			condition = !condition;
+		}
 
-		//-- Toggle for edit condition
-		// Adjust rectangle for checkbox
-		Rect toggleRect = position;
-		float toggleWidth = GUI.skin.toggle.CalcSize(new GUIContent("")).x;
-		toggleRect.xMax = toggleRect.xMin + toggleWidth + 8f;
-		bool newCondValue = EditorGUI.Toggle(toggleRect, condition);
-		// Set new condition value
-		SetValue(parent, editCondition.ConditionName, newCondValue);
+		if (editCondition.ShowCheckbox)
+		{
+			//-- Toggle for edit condition
+			// Adjust rectangle for checkbox
+			Rect toggleRect = position;
+			float toggleWidth = GUI.skin.toggle.CalcSize(new GUIContent("")).x;
+			toggleRect.xMax = toggleRect.xMin + toggleWidth + 8f;
+			bool newCondValue = EditorGUI.Toggle(toggleRect, condition);
+			// Set new condition value
+			SetValue(parent, editCondition.ConditionName, newCondValue);
+			// Adjust value rectangle
+			position.xMin = toggleRect.xMax;
+		}
 
 		//-- Property
-		position.xMin = toggleRect.xMax;
 		GUI.enabled = condition;
 		EditorGUI.PropertyField(position, property, label, true);
 		GUI.enabled = true;

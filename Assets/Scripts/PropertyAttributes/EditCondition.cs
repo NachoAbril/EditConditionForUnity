@@ -5,9 +5,11 @@
 public class EditCondition : PropertyAttribute
 {
 	public string ConditionName { get; private set; }
+	public bool ShowCheckbox { get; private set; }
 
-	public EditCondition(string conditionName)
+	public EditCondition(string conditionName, bool showCheckbox = true)
 	{
 		this.ConditionName = conditionName;
+		this.ShowCheckbox = showCheckbox;
 	}
 }
