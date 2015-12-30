@@ -16,6 +16,7 @@ public class EditConditionDrawer : PropertyDrawer
 
 		//-- Get edit condition property
 		object parent = GetParent(property);
+		bool isOpenForEdit = AssetDatabase.IsOpenForEdit((UnityEngine.Object)parent);
 		string conditionName = editCondition.ConditionName;
 		int numNegations = 0;
 		while (conditionName[0] == '!')
@@ -53,12 +54,15 @@ public class EditConditionDrawer : PropertyDrawer
 		}
 
 		//-- Property
-		GUI.enabled = condition;
+		GUI.enabled = condition && isOpenForEdit;
 		EditorGUI.PropertyField(position, property, label, true);
-		GUI.enabled = true;
+		GUI.enabled = isOpenForEdit;
 	}
 
-
+	public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+	{
+		return EditorGUI.GetPropertyHeight(property, label);
+	}
 
 	private object GetParent(SerializedProperty prop)
 	{
